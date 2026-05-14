@@ -246,7 +246,7 @@ class CardTags(CardTagsMixin, TaggerRequestHandler):
         number = kwargs.pop("number", None)
         back = kwargs.pop("back", False)
 
-        if not code or not number:
+        if code is None or number is None:
             raise ValueError("CardTags requires 'code' (set code) and 'number' (collector number)")
 
         super().__init__(**kwargs)
@@ -437,7 +437,7 @@ class TagBySlug(TaggerRequestHandler):
         slug = kwargs.pop("slug", None)
         tag_type = kwargs.pop("type", None)
 
-        if not slug or not tag_type:
+        if slug is None or tag_type is None:
             raise ValueError("TagBySlug requires 'slug' and 'type' arguments")
 
         super().__init__(**kwargs)
