@@ -12,10 +12,10 @@ server with one CSRF token per session.
 
 import gzip
 import json
-import re
 import threading
 import urllib.error
 import urllib.request
+from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from typing import Any, ClassVar
 
@@ -23,6 +23,33 @@ from ..base import ScrythonRequestHandler
 
 # A well-known card page to use for obtaining session cookies + CSRF token.
 _DEFAULT_SESSION_PAGE = "https://tagger.scryfall.com/card/sos/170"
+
+
+class _CSRFTokenParser(HTMLParser):
+    """Parse HTML meta tags to extract the csrf-token content."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.token: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "meta":
+            attr_map = dict(attrs)
+            if attr_map.get("name") == "csrf-token":
+                self.token = attr_map.get("content")
+
+
+def _extract_csrf_token(html: str) -> str | None:
+    """Extract CSRF token value from <meta name=\"csrf-token\" content=\"...\">.
+
+    Uses a proper HTML parser instead of regex, which is robust to
+    attribute ordering, whitespace, and quoting differences.
+    """
+    parser = _CSRFTokenParser()
+    parser.feed(html)
+    parser.close()
+    return parser.token
+
 
 class TaggerSession:
     """
@@ -65,9 +92,9 @@ class TaggerSession:
                 html = raw.decode("utf-8", errors="replace")
 
             # Extract CSRF token from <meta name="csrf-token" content="...">
-            match = re.search(r'<meta[^>]+name="csrf-token"[^>]+content="([^"]+)"', html)
-            if match:
-                cls._csrf_token = match.group(1)
+            token = _extract_csrf_token(html)
+            if token is not None:
+                cls._csrf_token = token
             else:
                 raise RuntimeError("Could not extract CSRF token from tagger.scryfall.com")
         except urllib.error.HTTPError as e:
