@@ -1109,7 +1109,7 @@ class CardsObjectMixin(CoreFieldsMixin, GameplayFieldsMixin, PrintFieldsMixin):
 
     def get_tags(
         self,
-        cache: bool = True,
+        cache: bool = False,
         cache_ttl: int = 3600,
         rate_limit: bool = True,
         rate_limit_per_second: float | None = None,
@@ -1125,7 +1125,7 @@ class CardsObjectMixin(CoreFieldsMixin, GameplayFieldsMixin, PrintFieldsMixin):
         illustration_tags, printing_tags, relationships, etc.).
 
         Args:
-            cache: Enable caching (default: True)
+            cache: Enable caching (default: False)
             cache_ttl: Cache TTL in seconds (default: 3600 = 1 hour)
             rate_limit: Enable rate limiting (default: True)
             rate_limit_per_second: Override the default tagger rate limit
@@ -1174,14 +1174,14 @@ class CardsObjectMixin(CoreFieldsMixin, GameplayFieldsMixin, PrintFieldsMixin):
 
         return scrython.tagger.CardTags(**kwargs)
 
-    def get_tag_names(self, cache: bool = True, cache_ttl: int = 3600) -> list[str]:
+    def get_tag_names(self, cache: bool = False, cache_ttl: int = 3600) -> list[str]:
         """
         Get all tag names for this card.
 
         Convenience method that fetches tags and returns just the names.
 
         Args:
-            cache: Enable caching (default: True)
+            cache: Enable caching (default: False)
             cache_ttl: Cache TTL in seconds (default: 3600)
 
         Returns:
@@ -1195,7 +1195,7 @@ class CardsObjectMixin(CoreFieldsMixin, GameplayFieldsMixin, PrintFieldsMixin):
         tags = self.get_tags(cache=cache, cache_ttl=cache_ttl)
         return tags.tag_names
 
-    def has_tag(self, tag_name: str, cache: bool = True, cache_ttl: int = 3600) -> bool:
+    def has_tag(self, tag_name: str, cache: bool = False, cache_ttl: int = 3600) -> bool:
         """
         Check if this card has a specific tag.
 
@@ -1203,7 +1203,7 @@ class CardsObjectMixin(CoreFieldsMixin, GameplayFieldsMixin, PrintFieldsMixin):
 
         Args:
             tag_name: The tag name to check (case-sensitive)
-            cache: Enable caching (default: True)
+            cache: Enable caching (default: False)
             cache_ttl: Cache TTL in seconds (default: 3600)
 
         Returns:
