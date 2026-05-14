@@ -19,11 +19,10 @@ import urllib.request
 from http.cookiejar import CookieJar
 from typing import Any, ClassVar
 
+from ..base import ScrythonRequestHandler
+
 # A well-known card page to use for obtaining session cookies + CSRF token.
 _DEFAULT_SESSION_PAGE = "https://tagger.scryfall.com/card/sos/170"
-
-_AGENT = "Scrython/2.0 (https://github.com/NandaScott/Scrython)"
-
 
 class TaggerSession:
     """
@@ -52,7 +51,7 @@ class TaggerSession:
         session cookie.
         """
         headers = {
-            "User-Agent": _AGENT,
+            "User-Agent": ScrythonRequestHandler._user_agent,
             "Accept": "text/html,application/json,*/*",
             "Accept-Encoding": "gzip, deflate",
         }
@@ -112,7 +111,7 @@ class TaggerSession:
         payload = json.dumps({"query": query, "variables": variables or {}}).encode("utf-8")
 
         headers = {
-            "User-Agent": _AGENT,
+            "User-Agent": ScrythonRequestHandler._user_agent,
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Accept-Encoding": "gzip, deflate",
