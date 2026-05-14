@@ -44,10 +44,10 @@ class TagObject:
         Falls back to `relatedName`, then `name` (the edge display name).
         """
         tag_data = self._data.get("tag")
-        if isinstance(tag_data, dict) and tag_data.get("name"):
+        if isinstance(tag_data, dict) and tag_data.get("name") is not None:
             return tag_data["name"]
         related = self._data.get("relatedName")
-        if related:
+        if related is not None:
             return related
         return self._data["name"]
 
