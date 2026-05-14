@@ -166,7 +166,10 @@ class TaggerSession:
             try:
                 body = e.read()
             except Exception as e2:
-                raise e2
+                raise RuntimeError(
+                    f"GraphQL request failed (HTTP {e.code}); "
+                    f"could not read error body: {e2}"
+                ) from e
             raise RuntimeError(
                 f"GraphQL request failed (HTTP {e.code}): "
                 f"{body.decode('utf-8', errors='replace')[:300]}"
