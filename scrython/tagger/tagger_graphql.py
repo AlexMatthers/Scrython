@@ -137,7 +137,8 @@ class TaggerSession:
                 # Refresh CSRF and retry once
                 with cls._lock:
                     cls._refresh_session()
-                headers["X-CSRF-Token"] = cls._csrf_token or ""
+                    csrf_token = cls._csrf_token
+                headers["X-CSRF-Token"] = csrf_token or ""
                 req = urllib.request.Request(
                     "https://tagger.scryfall.com/graphql",
                     data=payload,
