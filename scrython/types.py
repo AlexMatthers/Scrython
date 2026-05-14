@@ -342,6 +342,7 @@ class TaggerEdgeData(TypedDict):
     classifier: str  # One of EdgeClassifier enum values
     type: str  # "TAGGING" or "RELATIONSHIP"
     name: str  # Tag name or relationship label
+    tag: NotRequired[dict[str, str]]  # Nested tag data (name, description) for TAGGING edges
     namespace: NotRequired[str]
     annotation: NotRequired[str]
     metadata: NotRequired[str]
