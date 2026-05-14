@@ -59,16 +59,15 @@ class TaggerRequestHandler(ScrythonRequestHandler):
                 - cache_ttl (int): Cache TTL in seconds (default: 3600)
         """
         # Rate limiting setup (same pattern as ScrythonRequestHandler)
-        rate_limit_per_second = kwargs.get("rate_limit_per_second")
+        rate_limit_per_second = kwargs.pop("rate_limit_per_second", None)
+        self._rate_limited = kwargs.pop("rate_limit", True)
         self._override_limiter: Any = None
-        if rate_limit_per_second is not None:
+        if rate_limit_per_second is not None and self._rate_limited:
             self._override_limiter = TaggerRateLimiter(rate_limit_per_second)
 
-        self._rate_limited = kwargs.get("rate_limit", True)
-
         # Caching setup
-        self._use_cache = kwargs.get("cache", False)
-        self._cache_ttl = kwargs.get("cache_ttl", 3600)
+        self._use_cache = kwargs.pop("cache", False)
+        self._cache_ttl = kwargs.pop("cache_ttl", 3600)
 
         # Initialize data store
         self._scryfall_data: dict[str, Any] = {}
@@ -146,9 +145,6 @@ class TaggerRequestHandler(ScrythonRequestHandler):
         if hasattr(self, "_scryfall_namespace"):
             delattr(self, "_scryfall_namespace")
 
-    def __repr__(self) -> str:
-        class_name = self.__class__.__name__
-        return f"{class_name}()"
 
 
 class CardTags(CardTagsMixin, TaggerRequestHandler):
@@ -285,6 +281,7 @@ class CardTags(CardTagsMixin, TaggerRequestHandler):
         instance = cls.__new__(cls)
         TaggerRequestHandler.__init__(instance)
         instance._scryfall_data = copy.deepcopy(data)
+        instance._rate_limited = False
         instance._process_tags()
         return instance
 
